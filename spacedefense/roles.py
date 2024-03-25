@@ -12,8 +12,8 @@ class UFORole:
         self.life_value = hp
         self.x = random.randint(0, DISPLAY_WIDTH - 30)  # 随机初始化x坐标
         self.y = 30  # 将球的y坐标设置为固定值
-        self.speed_x = random.randint(-3, 3)  # 在x方向上设置随机速度
-        self.speed_y = random.randint(-3, 3)  # 在y方向上设置随机速度
+        self.speed_x = random.randint(1, 3)  # 在x方向上设置随机速度
+        self.speed_y = random.randint(1, 3)  # 在y方向上设置随机速度
         self.image = image_obj  # 加载图片
         self.width = self.image.get_width()  # 获取图片的宽度
         
@@ -27,14 +27,14 @@ class UFORole:
         self.y += self.speed_y  # 垂直移动球
 
         if self.x < 50:  # 如果球超出屏幕左边范围，反转x方向的速度
-            self.speed_x = abs(random.randint(-3, 4))
+            self.speed_x = abs(random.randint(1, 4))
         elif self.x > DISPLAY_WIDTH - 200:  # 如果球超出屏幕右边范围，反转x方向的速度
-            self.speed_x = -abs(random.randint(-3, 4))
+            self.speed_x = -abs(random.randint(1, 4))
 
         if self.y < 50:  # 如果球超出屏幕上边范围，反转y方向的速度
-            self.speed_y = abs(random.randint(-2, 2))
-        elif self.y > 500:  # 如果球超出屏幕下边范围，反转y方向的速度
-            self.speed_y = -abs(random.randint(-2, 2))
+            self.speed_y = abs(random.randint(1, 3))
+        elif self.y > DISPLAY_HEIGHT - 500:  # 如果球超出屏幕下边范围，反转y方向的速度
+            self.speed_y = -abs(random.randint(1, 3))
 
 
 class MyRole:
@@ -42,14 +42,18 @@ class MyRole:
 
     def __init__(self,name: str, hp: int, image_obj: any):
         self.name = name
+        self.life_hp = hp
         self.life_value = hp
         self.x = random.randint(0, DISPLAY_WIDTH - 30)  # 随机初始化x坐标
         self.y = 30  # 将球的y坐标设置为固定值
-        self.speed_x = random.randint(-3, 3)  # 在x方向上设置随机速度
-        self.speed_y = random.randint(-3, 3)  # 在y方向上设置随机速度
+        self.speed_x = random.randint(1, 3)  # 在x方向上设置随机速度
+        self.speed_y = random.randint(1, 3)  # 在y方向上设置随机速度
         self.image = image_obj  # 加载图片
         self.width = self.image.get_width()  # 获取图片的宽度
-    
+        
+    def reset(self):
+        self.life_value = self.life_hp
+        
     def get_life_value(self):
         if self.life_value < 0:
             return 0
@@ -60,14 +64,14 @@ class MyRole:
         self.y += self.speed_y  # 垂直移动球
 
         if self.x < 50:  # 如果球超出屏幕左边范围，反转x方向的速度
-            self.speed_x = abs(random.randint(-3, 3))
+            self.speed_x = abs(random.randint(1, 3))
         elif self.x > DISPLAY_WIDTH - 30:  # 如果球超出屏幕右边范围，反转x方向的速度
-            self.speed_x = -abs(random.randint(-3, 3))
+            self.speed_x = -abs(random.randint(1, 3))
 
         if self.y < 50:  # 如果球超出屏幕上边范围，反转y方向的速度
-            self.speed_y = abs(random.randint(-2, 2))
+            self.speed_y = abs(random.randint(1, 2))
         elif self.y > DISPLAY_HEIGHT - 300:  # 如果球超出屏幕下边范围，反转y方向的速度
-            self.speed_y = -abs(random.randint(-2, 2))
+            self.speed_y = -abs(random.randint(1, 2))
 
     def check_collision(self, role_obj):
         distance = math.sqrt((self.x - role_obj.x) ** 2 + (self.y - role_obj.y) ** 2)
@@ -107,7 +111,7 @@ class Fighter:
         self.name = name
         self.life_value = hp  # 设置生命值
         self.x = DISPLAY_WIDTH // 2  # 初始化x坐标
-        self.y = DISPLAY_HEIGHT - 200  # 将塔的y坐标设置为固定值
+        self.y = DISPLAY_HEIGHT - 240  # 将塔的y坐标设置为固定值
         self.speed_x = 6  # 在x方向上设置速度
         self.image = image_obj  # 加载图片
         self.width = self.image.get_width()  # 获取图片的宽度
@@ -187,7 +191,7 @@ class HBullet:
 
 
 # 创建表示条纹的类
-class Stripe:
+class XStripe:
     def __init__(self, x, color):
         self.x = x  # 设置条纹的x坐标
         self.speed = 1  # 设置条纹的速度
@@ -196,4 +200,16 @@ class Stripe:
     def move(self):
         self.x -= self.speed  # 水平移动条纹
         if self.x < -100:  # 如果条纹超出屏幕范围，重置其位置
-            self.x = 1600
+            self.x = DISPLAY_WIDTH
+
+# 创建表示条纹的类
+class YStripe:
+    def __init__(self, y, color):
+        self.y = y-90  # 设置条纹的x坐标
+        self.speed = 1  # 设置条纹的速度
+        self.color = color  # 设置条纹的颜色
+
+    def move(self):
+        self.y += self.speed  # 水平移动条纹
+        if self.y > DISPLAY_HEIGHT:  # 如果条纹超出屏幕范围，重置其位置
+            self.y = -90
