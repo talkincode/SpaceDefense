@@ -58,7 +58,6 @@ class StarFetchScene(Scene):
         self.myf_master_y_position = 0
         self.my_master_fighter_target_position = pygame.math.Vector2()
         self.using_keyboard = True
-        self.using_touch = False
 
         self.setup_background()
         self.setup_groups()
