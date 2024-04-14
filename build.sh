@@ -15,7 +15,7 @@ rm -fr spacedefense_wasm/spacedefense/__pycache__
 python -m pygbag --build spacedefense_wasm
 python3 -m pygbag --archive spacedefense_wasm/main.py
 
-cp spacedefense_wasm/build/web/index.html web/index.html
+cp web/index.html web/index.html
 cp spacedefense_wasm/build/web/spacedefense_wasm.apk web/spacedefense_wasm.apk
 cp spacedefense_wasm/build/web.zip web/web.zip
 rm -fr spacedefense_wasm
