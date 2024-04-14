@@ -317,8 +317,8 @@ class StarFetchScene(Scene):
             
         elif event.type == pygame.FINGERDOWN or event.type == pygame.FINGERMOTION:
             self.using_touch = True
-            self.my_master_fighter_target_position.x = event.x * DISPLAY_WIDTH * 1.5
-            self.my_master_fighter_target_position.y = (event.y * DISPLAY_HEIGHT) * 1.5 + self.my_master_fighter.rect.height // 2
+            self.my_master_fighter_target_position.x = event.x * DISPLAY_WIDTH * 1.2
+            self.my_master_fighter_target_position.y = (event.y * DISPLAY_HEIGHT) * 1.2 - self.my_master_fighter.rect.height // 2
             self.myf_fire_level1()
             
     def move_fighter_towards_target(self):
