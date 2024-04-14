@@ -452,6 +452,14 @@ frameborder="1"
             }
         }, false);
 
+        document.addEventListener('touchstart', function(e) {
+            var touch = e.touches[0];
+            var x = touch.clientX;
+            var y = touch.clientY;
+            // 假设你有一个从 JavaScript 调用 Python 函数的机制
+            Module.call_python_function('on_touch_start', x, y);
+        });
+
     }
 
     function debug() {
