@@ -306,11 +306,11 @@ class StarFetchScene(Scene):
             # UFO 自动呼叫支援
             self._auto_ufo_support()
             
-        elif event.type == pygame.MOUSEMOTION:
-            # 鼠标移动事件
-            self.my_master_fighter.rect.centerx = event.pos[0]
-            self.my_master_fighter.rect.centery = event.pos[1]
-            self.myf_fire_level1()
+        # elif event.type == pygame.MOUSEMOTION:
+        #     # 鼠标移动事件
+        #     self.my_master_fighter.rect.centerx = event.pos[0]
+        #     self.my_master_fighter.rect.centery = event.pos[1]
+        #     self.myf_fire_level1()
             
         elif event.type == pygame.FINGERDOWN or event.type == pygame.FINGERMOTION:
             self.my_master_fighter.rect.centerx = event.x * DISPLAY_WIDTH
