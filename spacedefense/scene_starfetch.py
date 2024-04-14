@@ -14,6 +14,7 @@ from .common import (
 from .flight_unit import FlightUnit
 from .actors import (
     Background,
+    CallSupportButton,
     Meteor,
     Particle,
     ProgressRect,
@@ -28,13 +29,14 @@ class StarFetchScene(Scene):
 
     __name__ = "StarFetchScene"
 
-    def __init__(self, manager):
+    def __init__(self, manager, clock):
         super().__init__(manager)
+        self.clock = clock
 
     def on_enter(self, **kwargs):
         self.myf_channel = pygame.mixer.Channel(1)
-        self.title_font = pygame.font.Font(None, 32)
-        self.subtitle_font = pygame.font.Font(None, 24)
+        self.title_font = pygame.font.Font(None, 30)
+        self.subtitle_font = pygame.font.Font(None, 22)
         self.countdown = configmap["game_time"]
         self.my_support_delay = 0
         self.my_score = 0
@@ -58,7 +60,7 @@ class StarFetchScene(Scene):
         self.my_master_fighter_target_position = pygame.math.Vector2()
         self.using_keyboard = True
         self.using_touch = False
-
+        
         self.setup_background()
         self.setup_groups()
         self.setup_events()
@@ -102,6 +104,7 @@ class StarFetchScene(Scene):
         self.ufo_units = pygame.sprite.Group()
         self.layout_units = pygame.sprite.Group()
         self.meteor_group = pygame.sprite.Group()
+        self.button_group = pygame.sprite.Group()
 
     def create_actors(self):
         # 创建敌方飞行单位
@@ -114,6 +117,8 @@ class StarFetchScene(Scene):
 
         self.my_master_upstate = ProgressRect(DISPLAY_WIDTH, 4, 0, y=DISPLAY_HEIGHT-70)
         self.layout_units.add(self.my_master_upstate)
+        self.call_support_button = CallSupportButton(10, DISPLAY_HEIGHT - 120)
+        self.button_group.add(self.call_support_button)
 
     def setup_events(self):
         # 创建一个计时器事件
@@ -320,7 +325,10 @@ class StarFetchScene(Scene):
             self.my_master_fighter_target_position.x = event.x * DISPLAY_WIDTH
             self.my_master_fighter_target_position.y = event.y * DISPLAY_HEIGHT - self.my_master_fighter.rect.height // 2
             self.myf_fire_level1()
-            
+        if event.type == pygame.FINGERUP or event.type == pygame.FINGERDOWN:
+            if self.call_support_button.click(event, (event.x, event.y)):
+                self._call_my_support()
+                
     def move_fighter_towards_target(self):
         if not self.using_touch:
             return
@@ -453,10 +461,9 @@ class StarFetchScene(Scene):
         mins, secs = divmod(self.countdown, 60)
         timer_str = "{:02d}:{:02d}".format(mins, secs)
         countdown_text = self.title_font.render(str(timer_str), True, Colors.white)
-        screen.blit(
-            countdown_text,
-            (20, screen.get_height() - countdown_text.get_height() - 36),
-        )
+        fps_text = self.subtitle_font.render(f"FPS:{round(self.clock.get_fps())}", True, Colors.white)
+        screen.blit(countdown_text,(10, screen.get_height() - countdown_text.get_height() - 36))
+        screen.blit(fps_text,(10, screen.get_height() - countdown_text.get_height() - 8))
 
         #################### 在中间显示战斗机 HP
         fighter_life_text = self.title_font.render(
@@ -512,6 +519,8 @@ class StarFetchScene(Scene):
             round(self.my_master_fighter.level * self.my_master_fighter.upgrade_cast),
         )
         self.meteor_group.update()
+        self.button_group.update()
+
 
     def draw(self, screen):
         # 绘制背景
@@ -547,8 +556,10 @@ class StarFetchScene(Scene):
         self.layout_units.draw(screen)
         self.particles.draw(screen)
         self.shock_particles.draw(screen)
+        self.button_group.draw(screen)
 
     def handle_events(self, events):
         for event in events:
             self._proc_on_event(event)
             self._proc_on_joyaxis_event(event)
+            

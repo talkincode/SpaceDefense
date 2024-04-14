@@ -32,17 +32,18 @@ class AsyncSpaceDefense(object):
     #######################################################
     async def start_game(self):
         """开始游戏"""
+        clock = pygame.time.Clock()
         scene_manager = SceneManager()
         start_scene = GameStartScene(scene_manager)
         end_scene = GameEndScene(scene_manager)
-        starfetch_scene = StarFetchScene(scene_manager)
+        starfetch_scene = StarFetchScene(scene_manager, clock)
         scene_manager.add_scene(start_scene)
         scene_manager.add_scene(end_scene)
         scene_manager.add_scene(starfetch_scene)
         scene_manager.switch_scene(GameStartScene.__name__)
 
         running = True
-        clock = pygame.time.Clock()
+        
         while running:
             clock.tick(60)
             scene_manager.handle_events(pygame.event.get())

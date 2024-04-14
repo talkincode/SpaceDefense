@@ -530,3 +530,32 @@ class Blast(pygame.sprite.Sprite):
         else:
             # 更新当前图像
             self.image = self.images[int(self.image_index)]
+
+class CallSupportButton(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.normal_image = res_manager.load_image("images/call_support.webp")
+        self.hover_image = res_manager.load_image("images/call_support_hover.webp")
+        self.clicked_image = res_manager.load_image("images/call_support_press.webp")
+        self.image = self.normal_image
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+        self.clicked = False
+
+    def click(self, event, pos):
+        result = False
+        hover = self.rect.collidepoint(pos)
+        if event.type == pygame.FINGERDOWN and hover:
+            self.clicked = True
+            self.image = self.clicked_image
+            result = True
+        if event.type == pygame.FINGERUP and hover:
+            self.clicked = False
+            self.image = self.hover_image
+
+        if hover and not self.clicked:
+            self.image = self.hover_image
+        elif not hover and not self.clicked:
+            self.image = self.normal_image
+        
+        return result
