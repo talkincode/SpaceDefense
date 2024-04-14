@@ -28,9 +28,6 @@ class Colors:
     light_yellow = (255, 255, 192)
 
     
-    
-    
-    
     @classmethod
     def get(cls, val):
         if val == "black":
