@@ -32,7 +32,6 @@ class StarFetchScene(Scene):
         super().__init__(manager)
 
     def on_enter(self, **kwargs):
-        self.using_touch = kwargs.get("using_touch", False)
         self.myf_channel = pygame.mixer.Channel(1)
         self.title_font = pygame.font.Font(None, 32)
         self.subtitle_font = pygame.font.Font(None, 24)
@@ -58,6 +57,7 @@ class StarFetchScene(Scene):
         self.myf_master_y_position = 0
         self.my_master_fighter_target_position = pygame.math.Vector2()
         self.using_keyboard = True
+        self.using_touch = False
 
         self.setup_background()
         self.setup_groups()
@@ -316,10 +316,10 @@ class StarFetchScene(Scene):
         #     self.myf_fire_level1()
             
         elif event.type == pygame.FINGERDOWN or event.type == pygame.FINGERMOTION:
-            if not self.using_touch:
-                self.my_master_fighter_target_position.x = event.x * DISPLAY_WIDTH
-                self.my_master_fighter_target_position.y = event.y * DISPLAY_HEIGHT - self.my_master_fighter.rect.height // 2
-                self.myf_fire_level1()
+            self.using_touch = True
+            self.my_master_fighter_target_position.x = event.x * DISPLAY_WIDTH
+            self.my_master_fighter_target_position.y = event.y * DISPLAY_HEIGHT - self.my_master_fighter.rect.height // 2
+            self.myf_fire_level1()
             
     def move_fighter_towards_target(self):
         if not self.using_touch:
