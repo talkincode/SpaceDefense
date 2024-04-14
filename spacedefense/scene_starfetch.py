@@ -55,6 +55,7 @@ class StarFetchScene(Scene):
         self.myf_master_fire3_active = False
         self.myf_master_x_position = 0
         self.myf_master_y_position = 0
+        self.my_master_fighter_target_position = pygame.math.Vector2()
 
         self.setup_background()
         self.setup_groups()
@@ -313,11 +314,16 @@ class StarFetchScene(Scene):
         #     self.myf_fire_level1()
             
         elif event.type == pygame.FINGERDOWN or event.type == pygame.FINGERMOTION:
-            self.my_master_fighter.rect.centerx = event.x * DISPLAY_WIDTH
-            self.my_master_fighter.rect.centery = event.y * DISPLAY_HEIGHT + self.my_master_fighter.rect.height//2
+            self.my_master_fighter_target_position.x = event.x * DISPLAY_WIDTH
+            self.my_master_fighter_target_position.y = event.y * DISPLAY_HEIGHT - self.my_master_fighter.rect.height // 2
             self.myf_fire_level1()
             
-
+    def move_fighter_towards_target(self):
+        # 逐渐移动战斗机到目标位置，使用一个简单的线性插值
+        if self.my_master_fighter.rect.centerx != self.my_master_fighter_target_position.x:
+            self.my_master_fighter.rect.centerx += (self.my_master_fighter_target_position.x - self.my_master_fighter.rect.centerx) * 0.1
+        if self.my_master_fighter.rect.centery != self.my_master_fighter_target_position.y:
+            self.my_master_fighter.rect.centery += (self.my_master_fighter_target_position.y - self.my_master_fighter.rect.centery) * 0.1
 
     def _auto_ufo_support(self):
         score_cast = configmap["task_level"]["starfetch"]["ufo_slave_cost"]
@@ -480,6 +486,7 @@ class StarFetchScene(Scene):
         self._proc_on_keydown()
         self._proc_check_joystick_fire_active()
         self._proc_update_myf_master_position()
+        self.move_fighter_towards_target()
 
         # 碰撞检测
         self._proc_on_collisions()
