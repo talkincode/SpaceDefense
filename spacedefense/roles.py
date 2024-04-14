@@ -1,7 +1,7 @@
 import pygame
 import random
 import math
-from spacedefense import DISPLAY_WIDTH, DISPLAY_HEIGHT
+from spacedefense import DISPLAY_WIDTH, DISPLAY_HEIGHT, check_collision
 
 
 class UFORole:
@@ -16,7 +16,8 @@ class UFORole:
         self.speed_y = random.randint(1, 3)  # 在y方向上设置随机速度
         self.image = image_obj  # 加载图片
         self.width = self.image.get_width()  # 获取图片的宽度
-        
+        self.height = self.image.get_height()  # 获取图片的高度
+
     def get_life_value(self):
         if self.life_value < 0:
             return 0
@@ -33,14 +34,14 @@ class UFORole:
 
         if self.y < 50:  # 如果球超出屏幕上边范围，反转y方向的速度
             self.speed_y = abs(random.randint(1, 3))
-        elif self.y > DISPLAY_HEIGHT - 500:  # 如果球超出屏幕下边范围，反转y方向的速度
+        elif self.y > DISPLAY_HEIGHT - 320:  # 如果球超出屏幕下边范围，反转y方向的速度
             self.speed_y = -abs(random.randint(1, 3))
 
 
 class MyRole:
     """我方支援单位"""
 
-    def __init__(self,name: str, hp: int, image_obj: any):
+    def __init__(self, name: str, hp: int, image_obj: any):
         self.name = name
         self.life_hp = hp
         self.life_value = hp
@@ -50,10 +51,11 @@ class MyRole:
         self.speed_y = random.randint(1, 3)  # 在y方向上设置随机速度
         self.image = image_obj  # 加载图片
         self.width = self.image.get_width()  # 获取图片的宽度
-        
+        self.height = self.image.get_height()  # 获取图片的高度
+
     def reset(self):
         self.life_value = self.life_hp
-        
+
     def get_life_value(self):
         if self.life_value < 0:
             return 0
@@ -74,12 +76,7 @@ class MyRole:
             self.speed_y = -abs(random.randint(1, 2))
 
     def check_collision(self, role_obj):
-        distance = math.sqrt((self.x - role_obj.x) ** 2 + (self.y - role_obj.y) ** 2)
-        cvalue = role_obj.width//2 + self.width//2
-        # 如果飞船的距离小于它们的直径之和，那么它们就发生了碰撞
-        if distance < cvalue:
-            return True
-        return False
+        return check_collision(self, role_obj)
 
 
 
@@ -115,7 +112,8 @@ class Fighter:
         self.speed_x = 6  # 在x方向上设置速度
         self.image = image_obj  # 加载图片
         self.width = self.image.get_width()  # 获取图片的宽度
-        
+        self.height = self.image.get_height()  # 获取图片的高度
+
     def get_life_value(self):
         if self.life_value < 0:
             return 0
@@ -125,6 +123,9 @@ class Fighter:
         new_x = self.x + dx * self.speed_x
         if 100 <= new_x <= DISPLAY_WIDTH - 100:
             self.x = new_x
+    
+    def check_collision(self, role_obj):
+        return check_collision(self, role_obj)
 
 
 class UfoBullet:
@@ -135,17 +136,14 @@ class UfoBullet:
         self.y = y
         self.radius = 14
         self.speed_y = 2
+        self.width = 28
+        self.height = 28
 
     def move(self):
         self.y += self.speed_y
 
     def check_collision(self, role_obj):
-        distance = math.sqrt((self.x - role_obj.x) ** 2 + (self.y - role_obj.y) ** 2)
-        cvalue = role_obj.width//2 + self.radius
-        # 如果炮弹和飞船的距离小于它们的直径之和，那么它们就发生了碰撞
-        if distance < cvalue:
-            return True
-        return False
+        return check_collision(self, role_obj)
 
 
 class Bullet:
@@ -157,17 +155,16 @@ class Bullet:
         self.radius = 14 if is_big else 8
         self.is_big = is_big
         self.speed_y = -8 if is_big else -6
+        self.width = 28 if is_big else 16
+        self.height = 28 if is_big else 16
 
     def move(self):
         self.y += self.speed_y
 
     def check_collision(self, role_obj):
-        distance = math.sqrt((self.x - role_obj.x) ** 2 + (self.y - role_obj.y) ** 2)
-        cvalue = role_obj.width//2 + self.radius
-        # 如果炮弹和飞船的距离小于它们的直径之和，那么它们就发生了碰撞
-        if distance < cvalue:
-            return True
-        return False
+        return check_collision(self, role_obj)
+
+
 
 class HBullet:
     """子弹类"""
@@ -182,12 +179,8 @@ class HBullet:
         self.x += self.speed_x
 
     def check_collision(self, role_obj):
-        distance = math.sqrt((self.x - role_obj.x) ** 2 + (self.y - role_obj.y) ** 2)
-        cvalue = role_obj.width//2 + self.radius
-        # 如果炮弹和飞船的距离小于它们的直径之和，那么它们就发生了碰撞
-        if distance < cvalue:
-            return True
-        return False
+        return check_collision(self, role_obj)
+
 
 
 # 创建表示条纹的类
@@ -202,10 +195,11 @@ class XStripe:
         if self.x < -100:  # 如果条纹超出屏幕范围，重置其位置
             self.x = DISPLAY_WIDTH
 
+
 # 创建表示条纹的类
 class YStripe:
     def __init__(self, y, color):
-        self.y = y-90  # 设置条纹的x坐标
+        self.y = y - 90  # 设置条纹的x坐标
         self.speed = 1  # 设置条纹的速度
         self.color = color  # 设置条纹的颜色
 
