@@ -314,7 +314,7 @@ class StarFetchScene(Scene):
             
         elif event.type == pygame.FINGERDOWN or event.type == pygame.FINGERMOTION:
             self.my_master_fighter.rect.centerx = event.x * DISPLAY_WIDTH
-            self.my_master_fighter.rect.centery = event.y * DISPLAY_HEIGHT
+            self.my_master_fighter.rect.centery = event.y * DISPLAY_HEIGHT + self.my_master_fighter.rect.height//2
             self.myf_fire_level1()
             
 
