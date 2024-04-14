@@ -1,21 +1,21 @@
 #!/bin/bash
 
 test -d web || mkdir web
-test -d build/spacedefense && rm -rf build/spacedefense
-mkdir -p build/spacedefense/spacedefense/assets/images
-mkdir -p build/spacedefense/spacedefense/assets/sounds
+test -d spacedefense_wasm && rm -rf spacedefense_wasm
+mkdir -p spacedefense_wasm/spacedefense/assets/images
+mkdir -p spacedefense_wasm/spacedefense/assets/sounds
 
-cp -r spacedefense/* build/spacedefense/spacedefense/
+cp -r spacedefense/* spacedefense_wasm/spacedefense/
 
-rm -f build/spacedefense/main.py
-cp wasm.py build/spacedefense/main.py
+rm -f spacedefense_wasm/main.py
+cp main.py spacedefense_wasm/main.py
 
-rm -fr build/spacedefense/spacedefense/__pycache__
+rm -fr spacedefense_wasm/spacedefense/__pycache__
 
-python -m pygbag --build build/spacedefense
-python3 -m pygbag --archive build/spacedefense/main.py
+python -m pygbag --build spacedefense_wasm
+python3 -m pygbag --archive spacedefense_wasm/main.py
 
-cp build/spacedefense/build/web/index.html web/index.html
-cp build/spacedefense/build/web/build/spacedefense.apk web/build/spacedefense.apk
-cp build/spacedefense/build/web.zip web/web.zip
-rm -fr build/spacedefense
+cp spacedefense_wasm/build/web/index.html web/index.html
+cp spacedefense_wasm/build/web/spacedefense_wasm.apk web/spacedefense_wasm.apk
+cp spacedefense_wasm/build/web.zip web/web.zip
+rm -fr spacedefense_wasm
