@@ -44,10 +44,7 @@ class AsyncSpaceDefense(object):
         running = True
         clock = pygame.time.Clock()
         while running:
-            if self.joystick:
-                clock.tick(120)
-            else:
-                clock.tick(60)
+            clock.tick(60)
             scene_manager.handle_events(pygame.event.get())
             scene_manager.update()
             scene_manager.draw(self.screen)
