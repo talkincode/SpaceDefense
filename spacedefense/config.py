@@ -45,11 +45,11 @@ configmap = {
         },
     },
     "ufo_slave": {
-        "images": ["images/ufo_slave.webp"],
+        "images": ["images/ufo_slave.webp", "images/ufo_slave2.webp"],
         "first_pos": (400, -100),
-        "score_cast": 10,
-        "max_limit": 4,
-        "min_limit": 2,
+        "score_cast": 50,
+        "max_limit": 6,
+        "min_limit": 3,
         "shield_value": 200,
         "shield_recharge_step": 5,
         "life_value": 700,
@@ -69,7 +69,7 @@ configmap = {
         "life_value": 700,
         "shield_value": 300,
         "shield_recharge_step": 1,
-        "speed": 6,
+        "speed": 8,
         "images": ["images/myfighter.webp"],
         "image_light": ["images/myfighter_light.webp", "images/myfighter_light2.webp"],
         "firehit_sound": "sounds/firehit.ogg",
@@ -141,7 +141,7 @@ configmap = {
             "images": ["images/meteor_shard.webp","images/meteor_shard2.webp","images/meteor_shard3.webp"],
             "damage": 100,
             "life_value": 300,
-            "score_value": 10,
+            "score_value": 50,
             "speed": [3,4,5,6,7,8,9],
         },
         "meteor_core": {
@@ -149,7 +149,15 @@ configmap = {
             "damage": 0,
             "life_value": 500,
             "score_value": 300,
-            "speed": [2,3,4,5,6,7,8],
+            "speed": [3,4,5,6,7,8,9],
+        }
+    },
+    "task_level":{
+        "starfetch": {
+            "ufo_slave_limit": 4,
+            "ufo_slave_cost": 10,
+            "slave_total": 10,
+            "target_score": 50000
         }
     }
 }

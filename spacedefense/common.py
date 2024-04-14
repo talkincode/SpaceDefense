@@ -20,6 +20,7 @@ class Colors:
     yellow = (255, 255, 0)
     # 橘色
     orange = (255, 165, 0)
+    orange_light = (255, 193, 7)
     # 青色
     cyan = (90, 255, 255)
     # 冷光色
@@ -97,6 +98,18 @@ class Scene:
         pass
 
     def handle_events(self, events):
+        pass
+    
+    def create_blast_sprite(self, obj: pygame.sprite.Sprite):
+        pass
+    
+    def create_particle(self, obj: pygame.sprite.Sprite):
+        pass
+    
+    def create_myf_bullet_sprite(self, obj: pygame.sprite.Sprite):
+        pass
+    
+    def create_ufo_bullet_sprite(self, obj: pygame.sprite.Sprite):
         pass
 
     def on_enter(self, **kwargs):

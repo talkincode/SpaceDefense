@@ -8,6 +8,7 @@ from .actors import (
 )
 from .scenes import GameStartScene, GameEndScene
 
+
 class AsyncSpaceDefense(object):
 
     def __init__(self):
@@ -24,6 +25,7 @@ class AsyncSpaceDefense(object):
         if pygame.joystick.get_count() > 0:
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
+
 
     #######################################################
     ## start game
@@ -42,11 +44,15 @@ class AsyncSpaceDefense(object):
         running = True
         clock = pygame.time.Clock()
         while running:
+            if self.joystick:
+                clock.tick(120)
+            else:
+                clock.tick(60)
             scene_manager.handle_events(pygame.event.get())
             scene_manager.update()
             scene_manager.draw(self.screen)
             pygame.display.flip()
-            clock.tick(60)
+
             await asyncio.sleep(0)
 
 

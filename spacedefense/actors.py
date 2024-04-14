@@ -4,7 +4,7 @@ import random
 from typing import List
 import pygame
 import math
-from .common import res_manager, Colors, DISPLAY_WIDTH, DISPLAY_HEIGHT
+from .common import res_manager, Colors, DISPLAY_WIDTH, DISPLAY_HEIGHT, get_assets
 
 
 class Background(pygame.sprite.Sprite):
@@ -25,7 +25,7 @@ class Background(pygame.sprite.Sprite):
 
 
     def update(self):
-        self.rect.y += 1  # Move the background down
+        self.rect.y += 2  # Move the background down
         if self.rect.y >= self.rect.height:
             self.rect.y = 0
 
@@ -34,7 +34,7 @@ class Bullet(pygame.sprite.Sprite):
     """炮弹"""
 
     def __init__(
-        self, x, y, speed=10, damage=1, direction="up", color=Colors.red, radius=5
+        self, x, y, speed=10, damage=1, direction="up", color=Colors.red, radius=5, id=1
     ):
         super().__init__()
         self.life_value = 1
@@ -42,20 +42,7 @@ class Bullet(pygame.sprite.Sprite):
         self.direction = direction
         self.speed = speed
         self.radius = radius
-        self.image = pygame.Surface([radius * 2, radius * 2], pygame.SRCALPHA)
-        self.image = self.image.convert_alpha()
-
-        # 从基础颜色到更亮的颜色创建渐变效果
-        for r in range(radius, 0, -1):
-            # 根据基础颜色和半径计算出渐变色
-            color_lerp = tuple(min(255, max(0, c + (radius - r) * 12)) for c in color)
-            pygame.draw.circle(self.image, color_lerp, (radius, radius), r)
-
-        # 添加光亮点，假设光亮点颜色为纯白
-        pygame.draw.circle(
-            self.image, (255, 255, 255), (radius, radius // 2), radius // 4
-        )
-
+        self.image = res_manager.load_image(f"images/bullet_{id}.webp").convert_alpha()
         self.rect = self.image.get_rect(center=(x, y))
 
     def hit(self, damage: int):
@@ -449,6 +436,7 @@ class ShockParticle(pygame.sprite.Sprite):
 
 
 class ProgressRect(pygame.sprite.Sprite):
+    
     def __init__(self, width, height, x, y):
         super().__init__()
         self.image = pygame.Surface((width, height))
@@ -480,14 +468,14 @@ class ProgressRect(pygame.sprite.Sprite):
         )
 
         # 在长方形上显示整数百分比
-        font = pygame.font.Font(None, 24)
-        text_surf = font.render(
-            f"upgrade: {int(percentage * 100)}%", True, Colors.white
-        )
-        text_rect = text_surf.get_rect(
-            center=(self.rect.width // 2, self.rect.height // 2)
-        )
-        self.image.blit(text_surf, text_rect)
+        # font = pygame.font.Font(None, 24)
+        # text_surf = font.render(
+        #     f"upgrade: {int(percentage * 100)}%", True, Colors.white
+        # )
+        # text_rect = text_surf.get_rect(
+        #     center=(self.rect.width // 2, self.rect.height // 2)
+        # )
+        # self.image.blit(text_surf, text_rect)
 
 
 class Meteor(pygame.sprite.Sprite):
@@ -515,3 +503,30 @@ class Meteor(pygame.sprite.Sprite):
         self.rect.y = self.y
         if self.y > DISPLAY_HEIGHT:
             self.kill()
+
+
+class Blast(pygame.sprite.Sprite):
+    
+    def __init__(self, target_sprite: pygame.sprite):
+        super().__init__()
+        self.target_sprite = target_sprite
+        self.images = res_manager.load_image_sequence("images/blast")
+        self.image_index = 0
+        self.image = self.images[0]
+        self.rect = self.image.get_rect(center=target_sprite.rect.center)
+        self.animation_speed = 0.5
+        
+    def update(self):
+        # 更新爆炸位置到目标精灵的当前位置
+        if self.target_sprite:
+            self.rect.center = self.target_sprite.rect.center
+        
+        # 更新图像索引以切换到下一帧
+        self.image_index += self.animation_speed
+        
+        # 如果动画播放完毕，删除精灵
+        if self.image_index >= len(self.images):
+            self.kill()
+        else:
+            # 更新当前图像
+            self.image = self.images[int(self.image_index)]

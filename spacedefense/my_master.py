@@ -2,16 +2,17 @@ import random
 import random
 import pygame
 
-from .actors import Bullet, SuperBullet, TraceBullet
-from .common import res_manager, Colors, DISPLAY_WIDTH, DISPLAY_HEIGHT
+from .actors import Blast, Bullet, SuperBullet, TraceBullet
+from .common import Scene, res_manager, Colors, DISPLAY_WIDTH, DISPLAY_HEIGHT
 
 
 class MyMasterFighter(pygame.sprite.Sprite):
     """我方战机"""
 
-    def __init__(self, config_data):
+    def __init__(self, config_data, scene: Scene):
         pygame.sprite.Sprite.__init__(self)
         self.config = config_data
+        self.scene = scene
         self.level = 1
         self.upgrade_points = 0
         self.upgrade_cast = self.config["upgrade_cast"]
@@ -85,7 +86,6 @@ class MyMasterFighter(pygame.sprite.Sprite):
         pygame.draw.rect(surface, Colors.orange, sfill_rect)
 
     def fire(self, group, level):
-        # self.recharge_delay = 0
         if self.fire_delay == 0:
             _bullet_per_num = self.config[level]["bullet_per_num"]
             total_bullets = _bullet_per_num  # 想要发射的子弹总数
@@ -255,14 +255,14 @@ class MyMasterFighter(pygame.sprite.Sprite):
             self.level += 1
 
         new_position = pygame.Vector2(self.rect.center) + self.direction 
-        if 32 <= new_position.x <= DISPLAY_WIDTH-32 and 64 <= new_position.y <= DISPLAY_HEIGHT - 128:
+        if 32 <= new_position.x <= DISPLAY_WIDTH-32 and 0 <= new_position.y <= DISPLAY_HEIGHT - 128:
             self.rect.center = new_position
-            self.direction.x = 0
-            self.direction.y = 0
+        self.direction.x = 0
+        self.direction.y = 0
 
     def move(self, x, y):
-        self.direction.x = x * self.speed
-        self.direction.y = y * self.speed
+        self.direction.x = x * self.speed 
+        self.direction.y = y * self.speed 
         
     def light(self):
         self.light_delay = 60

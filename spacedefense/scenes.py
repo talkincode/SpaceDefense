@@ -9,6 +9,10 @@ class GameStartScene(Scene):
 
     def __init__(self, manager):
         super().__init__(manager)
+
+
+    def on_enter(self, **kwargs):
+        self.next_scene = kwargs.get("next_scene", "StarFetchScene")  
         self.title_font = pygame.font.Font(get_assets("Imprint-MT-Shadow-2.ttf"), size=72)
         self.title_text_surface = self.title_font.render(
             "SpaceDefense", True, Colors.orange
@@ -19,10 +23,7 @@ class GameStartScene(Scene):
         self.text_surface = self.font.render(
             "Press space key to start", True, (255, 255, 255)
         )
-        self.text_rect = self.text_surface.get_rect(center=(240, 400))
-
-    def on_enter(self, **kwargs):
-        pass
+        self.text_rect = self.text_surface.get_rect(center=(240, 400))     
 
     def handle_events(self, events):
         for event in events:
@@ -31,7 +32,11 @@ class GameStartScene(Scene):
                 return True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    self.manager.switch_scene("StarFetchScene")
+                    self.manager.switch_scene(self.next_scene)
+                    return
+            elif event.type == pygame.JOYBUTTONDOWN:
+                if event.button == 15:
+                    self.manager.switch_scene(self.next_scene)
                     return
 
     def update(self):
@@ -91,6 +96,10 @@ class GameEndScene(Scene):
                 return True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
+                    self.manager.switch_scene(self.next_scene)
+                    return
+            elif event.type == pygame.JOYBUTTONDOWN:
+                if event.button == 15:
                     self.manager.switch_scene(self.next_scene)
                     return
 

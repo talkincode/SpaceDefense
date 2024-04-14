@@ -56,6 +56,7 @@ class FlightUnit(pygame.sprite.Sprite):
                     direction=direction,
                     color=Colors.get(self.config["bullet_color"]),
                     radius=self.config["bullet_radius"],
+                    id=self.type == "myf_slave" and "2" or "3",
                 )
             )
             if self.is_angry:
