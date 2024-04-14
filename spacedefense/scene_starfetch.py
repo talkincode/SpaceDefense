@@ -32,6 +32,7 @@ class StarFetchScene(Scene):
         super().__init__(manager)
 
     def on_enter(self, **kwargs):
+        self.using_touch = kwargs.get("use_touch", False)
         self.myf_channel = pygame.mixer.Channel(1)
         self.title_font = pygame.font.Font(None, 32)
         self.subtitle_font = pygame.font.Font(None, 24)
@@ -56,6 +57,8 @@ class StarFetchScene(Scene):
         self.myf_master_x_position = 0
         self.myf_master_y_position = 0
         self.my_master_fighter_target_position = pygame.math.Vector2()
+        self.using_keyboard = True
+        self.using_touch = False
 
         self.setup_background()
         self.setup_groups()
@@ -319,6 +322,8 @@ class StarFetchScene(Scene):
             self.myf_fire_level1()
             
     def move_fighter_towards_target(self):
+        if not self.using_touch:
+            return
         # 逐渐移动战斗机到目标位置，使用一个简单的线性插值
         if self.my_master_fighter.rect.centerx != self.my_master_fighter_target_position.x:
             self.my_master_fighter.rect.centerx += (self.my_master_fighter_target_position.x - self.my_master_fighter.rect.centerx) * 0.1

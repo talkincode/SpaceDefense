@@ -39,7 +39,7 @@ class GameStartScene(Scene):
                     self.manager.switch_scene(self.next_scene)
                     return
             elif event.type == pygame.FINGERDOWN or event.type == pygame.FINGERMOTION:
-                self.manager.switch_scene(self.next_scene)
+                self.manager.switch_scene(self.next_scene, use_touch=True)
                 return
 
     def update(self):
@@ -106,7 +106,7 @@ class GameEndScene(Scene):
                     self.manager.switch_scene(self.next_scene)
                     return
             elif event.type == pygame.FINGERDOWN or event.type == pygame.FINGERMOTION:
-                self.manager.switch_scene(self.next_scene)
+                self.manager.switch_scene(self.next_scene, use_touch=True)
                 return
 
     def update(self):
