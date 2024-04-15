@@ -171,7 +171,7 @@ class FlightUnit(pygame.sprite.Sprite):
             self.life_value = 0
             if not self.kill_time:
                 self.kill_time = pygame.time.get_ticks()
-                self.kill()  # 假设你想在这里“销毁”精灵
+                # self.kill()  # 假设你想在这里“销毁”精灵
 
         # 播放被击中的声音
         sound = res_manager.load_sound(self.config["firehit_sound"])
@@ -254,7 +254,6 @@ class FlightUnit(pygame.sprite.Sprite):
         if self.kill_time:
             if pygame.time.get_ticks() - self.kill_time > 500:  # 500毫秒后
                 self.kill()
-            else:
                 self.on_killed()
         else:
             if self.rect.left < 0:
