@@ -260,7 +260,6 @@ class SuperBullet(pygame.sprite.Sprite):
             self.particle_group.add(
                 Particle(self.rect.centerx, self.rect.centery, Colors.orange)
             )
-
         # 计算到目标的距离和角度
         dx = self.target.rect.centerx - self.rect.centerx
         dy = self.target.rect.centery - self.rect.centery

@@ -61,6 +61,7 @@ class StarFetchScene(Scene):
         self.using_touch = False
         self.fetch_total = 0
         self.kills = 0
+        self.ufo_master = None
 
         self.setup_background()
         self.setup_groups()
@@ -89,7 +90,8 @@ class StarFetchScene(Scene):
         """播放背景音乐""" ""
         pygame.mixer.music.load(get_assets(configmap["bgm"]["sound"]))
         pygame.mixer.music.set_volume(configmap["bgm"]["sound_volume"])
-        pygame.mixer.music.play(-1)
+        # pygame.mixer.music.play(-1)
+        pass
 
     def setup_groups(self):
         # 粒子组
@@ -105,11 +107,12 @@ class StarFetchScene(Scene):
         self.ufo_units = pygame.sprite.Group()
         self.layout_units = pygame.sprite.Group()
         self.meteor_group = pygame.sprite.Group()
+        self.ufo_super_bullets = pygame.sprite.Group()
+        self.my_super_bullets = pygame.sprite.Group()
 
     def create_actors(self):
         # 创建敌方飞行单位
-        self.ufo_master = FlightUnit.get_ufo_slave()
-        self.ufo_units.add(self.ufo_master)
+        self.ufo_units.add(FlightUnit.get_ufo_slave())
         self.my_master_fighter = MyMasterFighter(configmap["myf_master"], scene=self)
         self.my_flight_units.add(self.my_master_fighter)
 
@@ -186,31 +189,6 @@ class StarFetchScene(Scene):
                 trace_fire_delay=32,
             )
 
-    def _proc_on_joyaxis_event(self, event):
-        """手柄事件"""
-        if event.type == pygame.JOYAXISMOTION:
-            if event.axis == 0:
-                self.myf_master_x_position = event.value
-            elif event.axis == 1:
-                self.myf_master_y_position = event.value
-            # elif event.axis == 4 and event.value > 0.2:
-
-        if event.type == pygame.JOYBUTTONUP:
-            if event.button == 0:
-                self.myf_master_fire1_active = False
-
-        elif event.type == pygame.JOYBUTTONDOWN:
-            if event.button == 0:
-                # 速射机炮
-                self.myf_master_fire1_active = True
-            elif event.button == 10:
-                # 呼叫资源
-                if self.my_support_delay == 0:
-                    self._call_my_support()
-
-    def _proc_check_joystick_fire_active(self):
-        if self.myf_master_fire1_active:
-            self.myf_fire_level1()
 
     def _proc_update_myf_master_position(self):
         # 这里假设 self.my_master_fighter.move 接受一个速度参数
@@ -233,6 +211,8 @@ class StarFetchScene(Scene):
             self.my_master_fighter.move(0, 1)  # 向下移动
         if keys[pygame.K_1]:
             self.myf_fire_level1()
+        if keys[pygame.K_5]:
+            self.myf_fire_super_bullet()
         if keys[pygame.K_4]:
             if self.my_support_delay == 0:
                 self._call_my_support()
@@ -248,6 +228,20 @@ class StarFetchScene(Scene):
                 )
             else:
                 self.screen = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+
+    def myf_fire_super_bullet(self):
+        _target = self.ufo_master
+        if len(self.ufo_super_bullets) > 0:
+            _target = self.ufo_super_bullets.sprites()[0]
+        if not _target and len(self.ufo_units) > 0: 
+            _target  = self.ufo_units.sprites()[0]
+        if not _target:
+            return
+        self.my_master_fighter.super_fire(
+            self.my_super_bullets,
+            _target,
+            self.particles,
+        )
 
     def _proc_on_event(self, event):
         if event.type == pygame.QUIT:
@@ -291,6 +285,18 @@ class StarFetchScene(Scene):
                     target_groups=[self.my_flight_units, self.my_bullets],
                     particle_group=self.particles,
                 )
+                if self.ufo_master:
+                    score_cast = configmap["ufo_master"]["super_bullet"]["score_cast"]
+                    if (
+                        self.ufo_score > score_cast * 3
+                        and self.ufo_master.super_fire_delay == 0
+                    ):
+                        ufo.super_fire(
+                            self.ufo_super_bullets,
+                            self.my_master_fighter,
+                            self.particles,
+                        )
+                        self.update_ufo_socre(-score_cast)
 
         elif event.type == self.MY_FIGHTER_FIRE_TIMEREVENT:
             for myf in self.my_flight_units:
@@ -311,22 +317,6 @@ class StarFetchScene(Scene):
             # UFO 自动呼叫支援
             self._auto_ufo_support()
 
-        # elif event.type == pygame.MOUSEMOTION:
-        #     # 鼠标移动事件
-        #     self.my_master_fighter.rect.centerx = event.pos[0]
-        #     self.my_master_fighter.rect.centery = event.pos[1]
-        #     self.myf_fire_level1()
-
-        elif event.type == pygame.FINGERDOWN or event.type == pygame.FINGERMOTION:
-            self.using_touch = True
-            self.my_master_fighter_target_position.x = event.x * DISPLAY_WIDTH
-            self.my_master_fighter_target_position.y = (
-                event.y * DISPLAY_HEIGHT - self.my_master_fighter.rect.height // 2
-            )
-            self.myf_fire_level1()
-        if event.type == pygame.FINGERUP or event.type == pygame.FINGERDOWN:
-            if self.call_support_button.click(event, (event.x, event.y)):
-                self._call_my_support()
 
     def move_fighter_towards_target(self):
         if not self.using_touch:
@@ -353,6 +343,11 @@ class StarFetchScene(Scene):
         self.kills += 1
 
     def _auto_ufo_support(self):
+        if self.kills > 9:
+            if not self.ufo_master:
+                self.ufo_master = FlightUnit.get_ufo_master()
+                self.ufo_units.add(self.ufo_master)
+            return 
         score_cast = configmap["task_level"]["starfetch"]["ufo_slave_cost"]
         if self.ufo_score >= score_cast and len(self.ufo_units) < self.ufo_limit:
             sufo = FlightUnit.get_ufo_slave()
@@ -387,6 +382,58 @@ class StarFetchScene(Scene):
 
     def _proc_on_collisions(self):
         """处理碰撞检测, 伤害值， 分数值更新"""
+        
+        # 检测我方导弹与UFO单位的碰撞
+        super_collisions = pygame.sprite.groupcollide(
+            self.my_super_bullets, self.ufo_units, False, False
+        )
+        for my_bullet, hit_ufo_units in super_collisions.items():
+            for ufo_unit in hit_ufo_units:
+                if self.check_collision_cooldown(my_bullet, ufo_unit):
+                    if ufo_unit.type == "ufo_master":
+                        ufo_unit.hit(my_bullet.damage)
+                        self.create_hit_shock_particle(ufo_unit, 400)
+                        super_fire_sound = res_manager.load_sound(
+                            "sounds/super_firehit.ogg"
+                        )
+                        self.myf_channel.play(super_fire_sound)
+                        my_bullet.kill()
+                    else:
+                        ufo_unit.dodge_fighter(my_bullet)
+                        if my_bullet.life_value > 50:
+                            self.create_uhit_particle(ufo_unit, 200)
+                            ufo_unit.hit(10)
+                            my_bullet.hit(10)
+                        else:
+                            ufo_unit.hit(my_bullet.damage)
+                            my_bullet.kill()
+        
+        # 检测UFO导弹与我方单位的碰撞
+        ufo_super_collisions = pygame.sprite.groupcollide(
+            self.ufo_super_bullets, self.my_flight_units, False, False
+        )
+        for ufo_bullet, hit_myf_units in ufo_super_collisions.items():
+            for myf_unit in hit_myf_units:
+                if self.check_collision_cooldown(ufo_bullet, myf_unit):
+                    if myf_unit.type == "myf_master":
+                        myf_unit.hit(ufo_bullet.damage)
+                        self.create_hit_shock_particle(myf_unit, 300)
+                        super_fire_sound = res_manager.load_sound(
+                            "sounds/super_firehit.ogg"
+                        )
+                        self.myf_channel.play(super_fire_sound)
+                        ufo_bullet.kill()
+                    else:
+                        myf_unit.dodge_fighter(ufo_bullet)
+                        if ufo_bullet.life_value > 50:
+                            self.create_uhit_particle(myf_unit, 200)
+                            myf_unit.hit(10)
+                            ufo_bullet.hit(10)
+                        else:
+                            myf_unit.hit(ufo_bullet.damage)
+                            ufo_bullet.kill()
+        
+        
         # 检测我方炮弹与UFO单位的碰撞
         collisions = pygame.sprite.groupcollide(
             self.my_bullets, self.ufo_units, False, False
@@ -467,6 +514,25 @@ class StarFetchScene(Scene):
                     filehit_sound.set_volume(0.8)
                     filehit_sound.play()
                     self.create_hit_particle(met, 10)
+        
+        # 检测我UFO导弹与我方炮弹的碰撞
+        usbub_collisions = pygame.sprite.groupcollide(
+            self.ufo_super_bullets, self.my_bullets, False, True
+        )
+
+        for usupb, mybs in usbub_collisions.items():
+            for myb in mybs:
+                self.create_hit_particle(usupb, 10)
+                usupb.hit(myb.damage)
+                self.update_my_socre(myb.damage // self.my_score_step)
+                    
+        # 检测UFO导弹与我方导弹的碰撞
+        ss_collisions = pygame.sprite.groupcollide(
+            self.ufo_super_bullets, self.my_super_bullets, True, True
+        )
+
+        for u_bullet, my_bullets in ss_collisions.items():
+            self.create_hit_shock_particle(u_bullet, 200)
 
     def _proc_draw_texts(self, screen):
         #################### 在左下角绘制倒计时
@@ -521,9 +587,7 @@ class StarFetchScene(Scene):
 
         # 检测键盘
         self._proc_on_keydown()
-        self._proc_check_joystick_fire_active()
         self._proc_update_myf_master_position()
-        self.move_fighter_towards_target()
 
         # 碰撞检测
         self._proc_on_collisions()
@@ -536,6 +600,8 @@ class StarFetchScene(Scene):
         self.particles.update()
         self.my_bullets.update()
         self.ufo_bullets.update()
+        self.my_super_bullets.update()
+        self.ufo_super_bullets.update()
         self.shock_particles.update()
         self.my_flight_units.update()
         self.ufo_units.update()
@@ -561,15 +627,17 @@ class StarFetchScene(Scene):
         )
         # 绘制精灵组
         self.my_flight_units.draw(screen)
-        for unit in self.my_flight_units:
-            unit.draw_health_bar(screen)
+        # for unit in self.my_flight_units:
+        #     unit.draw_health_bar(screen)
 
         self.ufo_units.draw(screen)
-        for unit in self.ufo_units:
-            unit.draw_health_bar(screen)
+        # for unit in self.ufo_units:
+        #     unit.draw_health_bar(screen)
 
         self.my_bullets.draw(screen)
         self.ufo_bullets.draw(screen)
+        self.my_super_bullets.draw(screen)
+        self.ufo_super_bullets.draw(screen)
 
         self.meteor_group.draw(screen)
 
@@ -583,4 +651,3 @@ class StarFetchScene(Scene):
     def handle_events(self, events):
         for event in events:
             self._proc_on_event(event)
-            self._proc_on_joyaxis_event(event)

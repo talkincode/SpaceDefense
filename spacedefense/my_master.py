@@ -24,7 +24,7 @@ class MyMasterFighter(pygame.sprite.Sprite):
         self.image = res_manager.load_image(random.choice(self.config["images"]))
         self.rect = self.image.get_rect()
         self.rect.x = DISPLAY_WIDTH // 2  # 初始化x坐标
-        self.rect.y = DISPLAY_HEIGHT - 170  # 将塔的y坐标设置为固定值
+        self.rect.y = DISPLAY_HEIGHT - 240  # 将塔的y坐标设置为固定值
         self.speed = self.config["speed"]
         self.frame_rate = 400  # 每帧间隔毫秒数
         self.direction = pygame.Vector2(0,0)  

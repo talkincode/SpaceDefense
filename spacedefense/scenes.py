@@ -13,17 +13,17 @@ class GameStartScene(Scene):
 
     def on_enter(self, **kwargs):
         self.next_scene = kwargs.get("next_scene", "StarFetchScene")  
-        self.title_font = pygame.font.Font(get_assets("Imprint-MT-Shadow-2.ttf"), size=72)
+        self.title_font = pygame.font.Font(get_assets("Imprint-MT-Shadow-2.ttf"), size=96)
         self.title_text_surface = self.title_font.render(
             "SpaceDefense", True, Colors.orange
         )
-        self.title_text_rect = self.title_text_surface.get_rect(center=(240, 300))
+        self.title_text_rect = self.title_text_surface.get_rect(center=(360, 300))
         
         self.font = pygame.font.Font(get_assets("Imprint-MT-Shadow-2.ttf"), size=32)
         self.text_surface = self.font.render(
             "Press space key to start", True, (255, 255, 255)
         )
-        self.text_rect = self.text_surface.get_rect(center=(240, 400))     
+        self.text_rect = self.text_surface.get_rect(center=(360, 400))     
 
     def handle_events(self, events):
         for event in events:
